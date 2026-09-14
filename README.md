@@ -22,6 +22,9 @@ npm run preview    # serve the built bundle
 `dist/` is a static folder — deploy it to Vercel, Netlify, GitHub Pages or any static host.
 The build uses a relative base, so it works from a sub-path too.
 
+A GitHub Pages workflow is included at `.github/workflows/deploy.yml`. To switch it on, go to
+**Settings → Pages → Source → GitHub Actions**; every push to `main` then publishes the game.
+
 Requires WebGL 2 (any recent Chrome, Edge, Firefox or Safari). Designed for desktop / laptop.
 
 ## Controls
