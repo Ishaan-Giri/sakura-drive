@@ -82,19 +82,19 @@ export function pineTree(seed: number): BufferGeometry {
 export function bambooClump(seed: number): BufferGeometry {
   const rng = mulberry32(seed);
   const parts: BufferGeometry[] = [];
-  const stalks = 5 + Math.floor(rng() * 3);
+  const stalks = 4 + Math.floor(rng() * 3);
   for (let i = 0; i < stalks; i++) {
     const a = rng() * Math.PI * 2;
     const d = randRange(rng, 0, 1.3);
     const h = randRange(rng, 9, 13);
     const r = randRange(rng, 0.07, 0.11);
-    const stalk = new CylinderGeometry(r * 0.8, r, h, 6, 7);
+    const stalk = new CylinderGeometry(r * 0.8, r, h, 5, 1);
     stalk.translate(0, h / 2, 0);
     stalk.rotateZ(randRange(rng, -0.07, 0.07));
     stalk.rotateX(randRange(rng, -0.07, 0.07));
     stalk.translate(Math.cos(a) * d, 0, Math.sin(a) * d);
     parts.push(paint(stalk, [0x9dbd5f, 0x8fb356, 0xa7c468], 0.04, rng));
-    for (let j = 0; j < 3; j++) {
+    for (let j = 0; j < 2; j++) {
       const leaf = new IcosahedronGeometry(randRange(rng, 0.8, 1.3), 0);
       leaf.scale(1.4, 0.45, 1.4);
       leaf.translate(Math.cos(a) * d + randRange(rng, -0.8, 0.8), h - j * 1.6 - randRange(rng, 0, 0.8), Math.sin(a) * d + randRange(rng, -0.8, 0.8));

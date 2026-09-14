@@ -111,19 +111,21 @@ export class CarController {
     this.x += -this.speed * Math.sin(this.yaw) * dt;
     this.yaw += (yawRate - k * ds) * dt;
 
-    // Soft verge: a spring and a little extra steering push the car back towards the tarmac.
+    // Soft verge: the camber of the shoulder steers the car back towards the tarmac. This is a
+    // steering effect, so it scales with speed — a stationary car must never rotate on the spot.
     const over = Math.abs(this.x) - SOFT_EDGE;
     this.onVerge = Math.abs(this.x) > ROAD_HALF_WIDTH - 0.55 && this.speed > 1;
     if (over > 0) {
       const push = Math.min(1, over / (MAX_LATERAL - SOFT_EDGE));
-      this.yaw += Math.sign(this.x) * push * 1.1 * dt;
+      this.yaw += Math.sign(this.x) * push * 0.09 * this.speed * dt;
     }
     if (Math.abs(this.x) > MAX_LATERAL) {
       this.x = Math.sign(this.x) * MAX_LATERAL;
       // Cancel any outward heading so the car slides along the limit instead of stopping dead.
       if (Math.sign(Math.sin(this.yaw)) === -Math.sign(this.x)) this.yaw *= 0.55;
     }
-    this.yaw = clamp(this.yaw, -0.6, 0.6);
+    // Never let the car end up pointing across the road.
+    this.yaw = clamp(this.yaw, -0.5, 0.5);
 
     // --- place the model ----------------------------------------------------
     road.frame(this.s, this.frame);

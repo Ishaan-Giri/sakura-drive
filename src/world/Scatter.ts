@@ -63,7 +63,7 @@ export function scatterChunk(args: ScatterArgs): void {
     name: PropName,
     s: number,
     u: number,
-    opts: { scale?: [number, number]; face?: 0 | 1 | 2; allowWater?: boolean; tint?: number } = {},
+    opts: { scale?: [number, number]; face?: 0 | 1 | 2; allowWater?: boolean; tint?: number; sink?: number } = {},
   ): boolean => {
     if (Math.abs(u) < MIN_U && name !== 'torii') return false;
     const row = rowAt(s);
@@ -75,7 +75,7 @@ export function scatterChunk(args: ScatterArgs): void {
     if (face === 0) yaw += rng() * Math.PI * 2;
     else if (face === 1) yaw += (u > 0 ? 1 : -1) * (Math.PI / 2) + randRange(rng, -0.06, 0.06);
     const scale = opts.scale ? randRange(rng, opts.scale[0], opts.scale[1]) : 1;
-    add({ name, x: p.x, y: p.y, z: p.z, yaw, scale, tint: opts.tint ?? randRange(rng, 0.92, 1.06) });
+    add({ name, x: p.x, y: p.y - (opts.sink ?? 0), z: p.z, yaw, scale, tint: opts.tint ?? randRange(rng, 0.92, 1.06) });
     return true;
   };
 
@@ -138,7 +138,7 @@ export function scatterChunk(args: ScatterArgs): void {
     const s = randRange(rng, sStart, sEnd);
     if (!accept('ricefields', s)) continue;
     const u = (rng() < 0.5 ? -1 : 1) * randRange(rng, 30, 95);
-    put(rng() < 0.6 ? 'house2' : 'house0', s, u, { face: 1, scale: [0.9, 1.1] });
+    put(rng() < 0.6 ? 'house2' : 'house0', s, u, { face: 1, scale: [0.9, 1.1], sink: 0.45 });
   }
   for (let i = 0; i < scatterCount(4); i++) {
     const s = randRange(rng, sStart, sEnd);
@@ -154,13 +154,13 @@ export function scatterChunk(args: ScatterArgs): void {
     for (const side of [-1, 1]) {
       const ss = s + randRange(rng, -2.5, 2.5);
       if (!accept('village', ss) || rng() > 0.82) continue;
-      put(pickOf(HOUSES), ss, side * randRange(rng, 14.5, 18), { face: 1, scale: [0.92, 1.12] });
+      put(pickOf(HOUSES), ss, side * randRange(rng, 14.5, 18), { face: 1, scale: [0.92, 1.12], sink: 0.45 });
     }
   }
   for (let s = sStart + 6; s < sEnd; s += 17) {
     const side = rng() < 0.5 ? -1 : 1;
     if (!accept('village', s) || rng() > 0.6) continue;
-    put(pickOf(HOUSES), s + randRange(rng, -3, 3), side * randRange(rng, 29, 42), { face: 1, scale: [0.92, 1.12] });
+    put(pickOf(HOUSES), s + randRange(rng, -3, 3), side * randRange(rng, 29, 42), { face: 1, scale: [0.92, 1.12], sink: 0.45 });
   }
   for (let i = 0; i < scatterCount(6); i++) {
     const s = randRange(rng, sStart, sEnd);
@@ -170,13 +170,13 @@ export function scatterChunk(args: ScatterArgs): void {
   {
     const s = randRange(rng, sStart, sEnd);
     if (accept('village', s) && rng() < 0.5) {
-      put(pickOf(VENDING), s, (rng() < 0.5 ? -1 : 1) * 6.1, { face: 1 });
+      put(pickOf(VENDING), s, (rng() < 0.5 ? -1 : 1) * 6.1, { face: 1, sink: 0.08 });
     }
   }
 
   // ---- Bamboo grove ----------------------------------------------------------
   for (const side of [-1, 1]) {
-    for (let i = 0; i < scatterCount(46); i++) {
+    for (let i = 0; i < scatterCount(30); i++) {
       const s = randRange(rng, sStart, sEnd);
       if (!accept('bamboo', s)) continue;
       const t = Math.pow(rng(), 1.6);
@@ -193,12 +193,12 @@ export function scatterChunk(args: ScatterArgs): void {
   for (let k = Math.ceil(sStart / TORII_SPACING); k * TORII_SPACING < sEnd; k++) {
     const s = k * TORII_SPACING;
     if (weight('shrine', s) < 0.85) continue;
-    put('torii', s, 0, { face: 2, tint: randRange(rng, 0.97, 1.03) });
+    put('torii', s, 0, { face: 2, sink: 0.32, tint: randRange(rng, 0.97, 1.03) });
   }
   for (let k = Math.ceil(sStart / 14); k * 14 < sEnd; k++) {
     const s = k * 14;
     if (weight('shrine', s) < 0.6) continue;
-    for (const side of [-1, 1]) put('lantern', s, side * 6.0, { face: 1 });
+    for (const side of [-1, 1]) put('lantern', s, side * 6.0, { face: 1, sink: 0.06 });
   }
   for (const side of [-1, 1]) {
     for (let i = 0; i < scatterCount(22); i++) {
@@ -213,7 +213,7 @@ export function scatterChunk(args: ScatterArgs): void {
   for (let k = Math.ceil(sStart / 36); k * 36 < sEnd; k++) {
     const s = k * 36;
     if (weight('sakura', s) < 0.5) continue;
-    put('lantern', s, (k % 2 === 0 ? 1 : -1) * 5.9, { face: 1 });
+    put('lantern', s, (k % 2 === 0 ? 1 : -1) * 5.9, { face: 1, sink: 0.06 });
   }
   // Utility poles with sagging wires, wherever there are fields or houses.
   const poleAt = (k: number): boolean => {
@@ -230,7 +230,7 @@ export function scatterChunk(args: ScatterArgs): void {
   for (let k = Math.ceil(sStart / POLE_SPACING); k * POLE_SPACING < sEnd; k++) {
     if (!poleAt(k)) continue;
     const s = k * POLE_SPACING;
-    put('pole', s, POLE_U, { face: 2 });
+    put('pole', s, POLE_U, { face: 2, sink: 0.15 });
     if (poleAt(k + 1)) args.wire(polePoint(k), polePoint(k + 1));
   }
   // Grass tufts and wildflowers near the verge.

@@ -474,6 +474,22 @@ export class Game {
     else this.renderer.render(this.scene, this.camera.camera);
   }
 
+  /** Small stable surface for debugging and automated checks (see README). */
+  get debug() {
+    return {
+      controller: this.controller,
+      renderer: this.renderer,
+      scene: this.scene,
+      chunksLoaded: () => this.chunks.loaded,
+      biome: () => this.biomes.segmentAt(this.controller.s).id,
+      preset: () => this.preset.label,
+      teleport: (s: number) => {
+        this.controller.s = s;
+        this.chunks.rebuild(s);
+      },
+    };
+  }
+
   dispose(): void {
     this.running = false;
     this.input.dispose();
