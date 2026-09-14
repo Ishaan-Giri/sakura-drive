@@ -8,11 +8,13 @@ const LEAF_GREENS = [0x7fae5e, 0x8dbb66, 0x719f55, 0x99c46c];
 const FRESH_GREENS = [0xa9cf6a, 0xb8d877, 0x9cc563];
 const PINE_GREENS = [0x4e7a4a, 0x5a8752, 0x46703f];
 
-function blob(parts: BufferGeometry[], rng: () => number, colors: number[], x: number, y: number, z: number, r: number, jitter = 0.035) {
+function blob(parts: BufferGeometry[], rng: () => number, colors: number[], x: number, y: number, z: number, r: number) {
   const g = new IcosahedronGeometry(r, 1);
   g.scale(1, 0.82, 1);
   g.translate(x, y, z);
-  parts.push(paint(g, colors, jitter, rng));
+  // One colour per blob keeps the canopy reading as a single mass; the faceted geometry
+  // already supplies plenty of variation through shading.
+  parts.push(paint(g, [colors[Math.floor(rng() * colors.length)]], 0.012, rng));
 }
 
 /** Cherry blossom tree: gnarled trunk with a wide, cloud-like pink canopy (~6 m tall). */

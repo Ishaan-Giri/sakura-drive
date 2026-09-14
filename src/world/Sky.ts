@@ -30,11 +30,11 @@ export const AFTERNOON: SkyPalette = {
   top: 0x7fb4e8,
   horizon: 0xfae0e4,
   haze: 0xffd9c9,
-  groundBounce: 0x9bc07e,
+  groundBounce: 0xe8d3bd,
   sun: 0xfff0d8,
   sunDirection: new Vector3(0.45, 0.36, 0.82).normalize(),
   sunIntensity: 2.6,
-  hemiIntensity: 1.5,
+  hemiIntensity: 1.7,
 };
 
 const vertexShader = /* glsl */ `
@@ -62,8 +62,9 @@ const fragmentShader = /* glsl */ `
     col = mix(col, uHorizon * 0.92, smoothstep(0.0, -0.25, h));
     // Sun disc and a soft bloom around it.
     float d = max(dot(dir, normalize(uSunDir)), 0.0);
-    col += uSun * pow(d, 900.0) * 1.2;
-    col += uSun * pow(d, 14.0) * 0.22;
+    col += uSun * pow(d, 1400.0) * 0.85;
+    col += uSun * pow(d, 90.0) * 0.18;
+    col += uSun * pow(d, 8.0) * 0.14;
     gl_FragColor = vec4(col, 1.0);
   }
 `;
